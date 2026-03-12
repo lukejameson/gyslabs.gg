@@ -196,12 +196,14 @@
             state = new Uint8Array(cols * rows);
             next  = new Uint8Array(cols * rows);
 
-            /* Seed with R-pentomino at a random position */
+            /* Seed with two R-pentominoes at random positions */
             state.fill(0);
-            const cr = 2 + ((Math.random() * (rows - 4)) | 0);
-            const cc = 2 + ((Math.random() * (cols - 4)) | 0);
-            [[0,1],[0,2],[1,0],[1,1],[2,1]].forEach(([dr,dc]) =>
-                { state[(cr+dr)*cols+(cc+dc)] = 1; });
+            for (let i = 0; i < 2; i++) {
+                const cr = 2 + ((Math.random() * (rows - 4)) | 0);
+                const cc = 2 + ((Math.random() * (cols - 4)) | 0);
+                [[0,1],[0,2],[1,0],[1,1],[2,1]].forEach(([dr,dc]) =>
+                    { state[(cr+dr)*cols+(cc+dc)] = 1; });
+            }
 
             /* Offscreen canvas — all cells dark, blit each frame as base */
             bgCanvas = document.createElement('canvas');
@@ -244,8 +246,8 @@
         function frame() {
             requestAnimationFrame(frame);
 
-            /* One GoL generation every 15 frames (~4 gen/sec) */
-            if (++tick % 15 === 0) stepGoL();
+            /* One GoL generation every 5 frames (~12 gen/sec) */
+            if (++tick % 5 === 0) stepGoL();
 
             /* Dark base, then light up alive cells on top */
             ctx.drawImage(bgCanvas, 0, 0);
