@@ -1,220 +1,514 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GSY Labs - Coming Soon</title>
+    <meta name="description" content="GSY Labs builds modern, reliable infrastructure tools for Guernsey. Explore roads.gg, airways.gg, seas.gg, and more.">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta property="og:title" content="GSY Labs - Guernsey Infrastructure, Reimagined">
+    <meta property="og:description" content="Modern infrastructure tools for Guernsey. Real-time road closures, flights, tides, and public transport.">
+    <meta property="og:image" content="gsylabs.webp">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="GSY Labs">
+    <meta name="twitter:description" content="Modern infrastructure tools for Guernsey">
+    <title>GSY Labs - Guernsey Infrastructure, Reimagined</title>
     <link rel="icon" type="image/png" href="gsylabs.webp">
+    <link rel="apple-touch-icon" href="gsylabs.webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Space Grotesk', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            background: #000;
-            min-height: 100vh;
-            overflow: hidden;
+            background: #0a0a0a;
             font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow-x: hidden;
         }
-
-        canvas {
+        #gol-canvas {
             position: fixed;
             top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 1;
+            width: 100%; height: 100vh;
+            z-index: 0;
+            opacity: 1;
+            transition: opacity 0.5s ease;
         }
-
-        .logo {
-            position: fixed;
-            top: 30px; right: 30px;
-            width: 110px; height: 110px;
-            z-index: 1000;
-            border-radius: 50%;
-            box-shadow: 0 0 30px rgba(255,255,255,0.08);
-        }
-
-        .card-container {
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 100;
+        #gol-canvas.hidden-canvas {
+            opacity: 0;
             pointer-events: none;
         }
-
-        .card {
-            background: rgba(12, 12, 12, 0.88);
+        .glass-card {
+            background: rgba(20, 20, 20, 0.9);
             border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 20px;
-            padding: 60px 80px;
-            text-align: center;
             backdrop-filter: blur(16px);
             box-shadow: 0 8px 48px rgba(0,0,0,0.6);
+            overflow: visible;
         }
-
-        .card h1 {
-            color: #fff;
-            font-size: 48px;
-            font-weight: bold;
-            letter-spacing: 8px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
+        .app-card {
+            background: rgba(22, 22, 24, 0.6);
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
         }
-
-        .card p {
-            color: rgba(255,255,255,0.5);
-            font-size: 18px;
-            letter-spacing: 2px;
+        .app-card:hover {
+            background: rgba(28, 28, 32, 0.8);
+            border-color: rgba(255,255,255,0.12);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
         }
-
-        .divider {
-            width: 100%;
+        .app-card.coming-soon {
+            background: rgba(20, 20, 22, 0.25);
+            border: 2px dashed rgba(255,255,255,0.1);
+            opacity: 0.65;
+        }
+        .app-card.coming-soon:hover {
+            background: rgba(20, 20, 22, 0.25);
+            border-color: rgba(255,255,255,0.1);
+            transform: none;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+        }
+        .visual-placeholder {
+            background: linear-gradient(135deg, rgba(52,54,62,0.4) 0%, rgba(36,36,36,0.4) 100%);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .section-divider {
             height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        }
+        .scroll-indicator { animation: bounce 2s infinite; }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        .btn-primary {
             background: rgba(255,255,255,0.08);
-            margin: 36px 0 28px;
+            border: 1.5px solid rgba(255,255,255,0.25);
+            transition: all 0.3s ease;
+            color: #fff;
+            box-shadow: 0 0 0 0 rgba(255,255,255,0);
         }
-
-        .contact {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 24px;
-            pointer-events: all;
+        .btn-primary:hover {
+            background: rgba(255,255,255,0.18);
+            border-color: rgba(255,255,255,0.5);
+            box-shadow: 0 0 20px rgba(255,255,255,0.25);
         }
-
-        .contact a {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .btn-primary:focus-visible {
+            outline: 2px solid rgba(255,255,255,0.6);
+            outline-offset: 2px;
+        }
+        .btn-primary:active {
+            background: rgba(255,255,255,0.3);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.6) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .form-input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            color: #fff;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+        .form-input:focus {
+            outline: none;
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.25);
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
+        }
+        .form-input::placeholder {
             color: rgba(255,255,255,0.4);
-            text-decoration: none;
-            font-size: 13px;
-            letter-spacing: 1px;
-            transition: color 0.2s;
         }
-
-        .contact a:hover { color: rgba(255,255,255,0.9); }
-
-        .contact a svg {
-            width: 16px; height: 16px;
-            fill: currentColor;
-            flex-shrink: 0;
+        textarea.form-input {
+            resize: vertical;
+            min-height: 120px;
         }
-
-        .contact-sep {
-            width: 1px; height: 16px;
-            background: rgba(255,255,255,0.12);
+        .screenshot-wrap {
+            margin-bottom: 1.5rem;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
-
-        .projects {
+        .screenshot-chrome {
+            background: rgba(40,40,44,0.9);
+            padding: 8px 12px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 24px;
-            pointer-events: all;
+            gap: 6px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
         }
-
-        .projects a {
-            color: rgba(255,255,255,0.3);
-            text-decoration: none;
-            font-size: 12px;
-            letter-spacing: 1.5px;
-            text-transform: lowercase;
-            transition: color 0.2s;
+        .screenshot-chrome span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
         }
-
-        .projects a:hover { color: rgba(255,255,255,0.8); }
-
-        @media (max-width: 768px) {
-            .logo { width: 75px; height: 75px; top: 16px; right: 16px; }
-            .card { padding: 36px 40px; margin: 0 16px; }
-            .card h1 { font-size: 28px; letter-spacing: 4px; }
-            .card p { font-size: 13px; }
-            .contact { gap: 16px; }
-            .contact a { font-size: 12px; }
+        .screenshot-chrome .dot-red   { background: #ff5f57; }
+        .screenshot-chrome .dot-amber { background: #ffbd2e; }
+        .screenshot-chrome .dot-green { background: #28c840; }
+        .screenshot-container {
+            height: 150px;
+            overflow: hidden;
+        }
+        @media (min-width: 640px) {
+            .screenshot-container {
+                height: 180px;
+            }
+        }
+        @media (min-width: 768px) {
+            .screenshot-container {
+                height: 200px;
+            }
+        }
+        .screenshot-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center;
+            display: block;
+            transform-origin: top center;
         }
     </style>
 </head>
-<body>
-    <canvas id="c"></canvas>
+<body class="text-white">
 
-    <img src="gsylabs.webp" alt="GSY Labs" class="logo">
+    <canvas id="gol-canvas"></canvas>
 
-    <div class="card-container">
-        <div class="card">
-            <h1>Coming Soon</h1>
-            <p>Building something special<span class="dots">...</span></p>
+    <a href="#" class="fixed top-4 right-4 sm:top-6 sm:right-6 z-50" aria-label="GSY Labs home">
+        <img src="gsylabs.webp" alt="GSY Labs" class="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full shadow-lg hover:scale-105 transition-transform">
+    </a>
 
-            <div class="divider"></div>
-
-            <div class="contact">
-                <a href="mailto:contact@gsylabs.gg">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
-                    </svg>
-                    contact@gsylabs.gg
+    <!-- Hero -->
+    <section id="hero" class="relative min-h-screen flex items-center justify-center z-10 px-4 sm:px-6">
+        <div class="glass-card rounded-2xl p-6 sm:p-8 md:p-16 text-center max-w-3xl">
+            <h1 class="text-2xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6 gradient-text" style="line-height: 1.3; overflow: visible;">
+                Guernsey Infrastructure,<br>Reimagined
+            </h1>
+            <p class="text-base sm:text-lg md:text-xl text-white/60 mb-6 sm:mb-8 max-w-xl mx-auto leading-relaxed">
+                Building modern, reliable tools for local infrastructure and transport information across the island.
+            </p>
+            <div class="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4">
+                <a href="#apps" class="btn-primary px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm tracking-wide font-medium w-full sm:w-auto">
+                    Explore Our Apps
                 </a>
-                <div class="contact-sep"></div>
-                <a href="https://www.linkedin.com/company/gyslabs" target="_blank" rel="noopener">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                    </svg>
-                    LinkedIn
+                <a href="#about" class="px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm tracking-wide font-medium text-white/60 hover:text-white transition-colors border border-white/20 hover:border-white/40 w-full sm:w-auto text-center">
+                    Learn More
                 </a>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="projects">
-                <a href="https://roads.gg" target="_blank" rel="noopener">roads.gg</a>
-                <div class="contact-sep"></div>
-                <a href="https://airways.gg" target="_blank" rel="noopener">airways.gg</a>
-                <div class="contact-sep"></div>
-                <a href="https://seas.gg" target="_blank" rel="noopener">seas.gg</a>
+                <a href="#contact" class="px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm tracking-wide font-medium text-white/60 hover:text-white transition-colors border border-white/20 hover:border-white/40 w-full sm:w-auto text-center">
+                    Get in Touch
+                </a>
             </div>
         </div>
-    </div>
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 scroll-indicator">
+                <a href="#apps" class="text-white/30 hover:text-white/60 transition-colors" aria-label="Scroll to apps section">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+            </a>
+        </div>
+    </section>
+
+    <main class="relative z-10 bg-[#0a0a0a]">
+
+        <!-- Apps -->
+        <section id="apps" class="py-16 sm:py-24 md:py-32 px-4 sm:px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-12 sm:mb-16">
+                    <h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-3 sm:mb-4">Our Apps</h2>
+                    <p class="text-white/50 text-base sm:text-lg max-w-2xl mx-auto">
+                        Essential tools for navigating Guernsey's infrastructure, built with care for our local community.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
+
+                    <!-- roads.gg -->
+                    <div class="app-card rounded-2xl p-4 sm:p-6 md:p-8">
+                        <div class="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-5">
+                            <img src="roads-icon.webp" alt="roads.gg" class="w-10 sm:w-12 h-10 sm:h-12 rounded-xl object-cover flex-shrink-0">
+                            <div class="min-w-0">
+                                <h3 class="text-lg sm:text-xl font-semibold mb-1 truncate">roads.gg</h3>
+                                <p class="text-white/50 text-xs sm:text-sm line-clamp-2">Road closure tracking and alerts for Guernsey</p>
+                            </div>
+                        </div>
+                        <div class="screenshot-wrap">
+                            <div class="screenshot-chrome">
+                                <span class="dot-red"></span>
+                                <span class="dot-amber"></span>
+                                <span class="dot-green"></span>
+                            </div>
+                            <div class="screenshot-container">
+                                <img src="roads-screenshot.webp" alt="roads.gg screenshot" loading="lazy">
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2">
+                            <span class="text-white/40 text-xs sm:text-sm truncate">800+ daily views</span>
+                            <a href="https://roads.gg" target="_blank" rel="noopener" aria-label="Launch roads.gg (opens in new window)" class="btn-primary px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-medium inline-flex items-center gap-2 whitespace-nowrap">
+                                Launch
+                                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- airways.gg -->
+                    <div class="app-card rounded-2xl p-4 sm:p-6 md:p-8">
+                        <div class="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-5">
+                            <img src="airways-icon.webp" alt="airways.gg" class="w-10 sm:w-12 h-10 sm:h-12 rounded-xl object-cover flex-shrink-0">
+                            <div class="min-w-0">
+                                <h3 class="text-lg sm:text-xl font-semibold mb-1 truncate">airways.gg</h3>
+                                <p class="text-white/50 text-xs sm:text-sm line-clamp-2">Flight tracking and airport information</p>
+                            </div>
+                        </div>
+                        <div class="screenshot-wrap">
+                            <div class="screenshot-chrome">
+                                <span class="dot-red"></span>
+                                <span class="dot-amber"></span>
+                                <span class="dot-green"></span>
+                            </div>
+                            <div class="screenshot-container">
+                                <img src="airways-screenshot.webp" alt="airways.gg screenshot" loading="lazy">
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2">
+                            <span class="text-white/40 text-xs sm:text-sm truncate">Live departures</span>
+                            <a href="https://airways.gg" target="_blank" rel="noopener" aria-label="Launch airways.gg (opens in new window)" class="btn-primary px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-medium inline-flex items-center gap-2 whitespace-nowrap">
+                                Launch
+                                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- seas.gg -->
+                    <div class="app-card rounded-2xl p-4 sm:p-6 md:p-8">
+                        <div class="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-5">
+                            <img src="seas-icon.webp" alt="seas.gg" class="w-10 sm:w-12 h-10 sm:h-12 rounded-xl object-cover flex-shrink-0">
+                            <div class="min-w-0">
+                                <h3 class="text-lg sm:text-xl font-semibold mb-1 truncate">seas.gg</h3>
+                                <p class="text-white/50 text-xs sm:text-sm line-clamp-2">Harbour schedules and marine conditions</p>
+                            </div>
+                        </div>
+                        <div class="screenshot-wrap">
+                            <div class="screenshot-chrome">
+                                <span class="dot-red"></span>
+                                <span class="dot-amber"></span>
+                                <span class="dot-green"></span>
+                            </div>
+                            <div class="screenshot-container">
+                                <img src="seas-screenshot.webp" alt="seas.gg screenshot" loading="lazy">
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2">
+                            <span class="text-white/40 text-xs sm:text-sm truncate">Tide tracking</span>
+                            <a href="https://seas.gg" target="_blank" rel="noopener" aria-label="Launch seas.gg (opens in new window)" class="btn-primary px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-medium inline-flex items-center gap-2 whitespace-nowrap">
+                                Launch
+                                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- stops.gg (coming soon) -->
+                    <div class="app-card coming-soon rounded-2xl p-4 sm:p-6 md:p-8">
+                        <div class="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-5">
+                            <div class="w-10 sm:w-12 h-10 sm:h-12 rounded-xl bg-white/5 flex items-center justify-center text-lg sm:text-2xl flex-shrink-0" aria-hidden="true">🚌</div>
+                            <div class="min-w-0">
+                                <h3 class="text-lg sm:text-xl font-semibold mb-1 text-white/40 truncate">stops.gg</h3>
+                                <p class="text-white/25 text-xs sm:text-sm line-clamp-2">Public transport information</p>
+                            </div>
+                        </div>
+                        <div class="visual-placeholder rounded-xl h-32 sm:h-44 md:h-52 mb-4 sm:mb-6 flex items-center justify-center" style="border: 1px dashed rgba(255,255,255,0.08);">
+                            <div class="text-center">
+                                <div class="text-3xl sm:text-5xl mb-2 sm:mb-3 opacity-40" aria-hidden="true">🚏</div>
+                                <div class="text-white/30 text-xs sm:text-sm font-medium">Bus stops & timetables</div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-2">
+                            <span class="text-white/20 text-xs sm:text-sm">Coming soon</span>
+                            <span class="px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium text-white/30 border border-white/10">Soon</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider max-w-4xl mx-auto"></div>
+
+        <!-- About -->
+        <section id="about" class="py-24 md:py-32 px-4">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-5xl font-bold mb-4">About</h2>
+                </div>
+                <div class="glass-card rounded-2xl p-8 md:p-12">
+                    <div class="grid md:grid-cols-2 gap-12">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4 text-white/80">Our Mission</h3>
+                            <p class="text-white/50 leading-relaxed mb-6">
+                                GSY Labs builds reliable, user-friendly infrastructure tools designed specifically for Guernsey. We believe local communities deserve modern digital services that work seamlessly and provide real value to residents and visitors alike.
+                            </p>
+                            <p class="text-white/50 leading-relaxed">
+                                From road closures to flight information, we're creating the essential digital infrastructure layer that helps everyone navigate the island more easily.
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4 text-white/80">Tech Stack</h3>
+                            <div class="flex flex-wrap gap-3 mb-8">
+                                <span class="px-4 py-2 rounded-full bg-white/5 text-white/60 text-sm border border-white/10">SvelteKit</span>
+                                <span class="px-4 py-2 rounded-full bg-white/5 text-white/60 text-sm border border-white/10">TypeScript</span>
+                                <span class="px-4 py-2 rounded-full bg-white/5 text-white/60 text-sm border border-white/10">Tailwind CSS</span>
+                                <span class="px-4 py-2 rounded-full bg-white/5 text-white/60 text-sm border border-white/10">Node.js</span>
+                                <span class="px-4 py-2 rounded-full bg-white/5 text-white/60 text-sm border border-white/10">PostgreSQL</span>
+                                <span class="px-4 py-2 rounded-full bg-white/5 text-white/60 text-sm border border-white/10">Docker</span>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-4 text-white/80">Built With</h3>
+                            <p class="text-white/50 leading-relaxed">
+                                Modern web technologies, real-time data feeds, and a deep understanding of local infrastructure needs. Every app is designed to be fast, reliable, and accessible.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider max-w-4xl mx-auto"></div>
+
+        <!-- Contact -->
+        <section id="contact" class="py-16 sm:py-24 md:py-32 px-4 sm:px-6">
+            <div class="max-w-2xl mx-auto">
+                <div class="text-center mb-12 sm:mb-16">
+                    <h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-3 sm:mb-4">Get in Touch</h2>
+                    <p class="text-white/50 text-sm sm:text-base">Have a question or want to collaborate? We'd love to hear from you.</p>
+                </div>
+                <form action="https://formspree.io/f/mnjgvdln" method="POST" class="space-y-4 sm:space-y-6">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-white/70 mb-2">Name</label>
+                        <input type="text" id="name" name="name" class="form-input w-full" placeholder="Your name" required aria-label="Your name">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-white/70 mb-2">Email</label>
+                        <input type="email" id="email" name="email" class="form-input w-full" placeholder="your@email.com" required aria-label="Your email">
+                    </div>
+                    <div>
+                        <label for="subject" class="block text-sm font-medium text-white/70 mb-2">Subject</label>
+                        <input type="text" id="subject" name="subject" class="form-input w-full" placeholder="What's this about?" required aria-label="Message subject">
+                    </div>
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-white/70 mb-2">Message</label>
+                        <textarea id="message" name="message" class="form-input w-full" placeholder="Tell us more..." required aria-label="Your message"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary px-8 py-3 rounded-full text-sm tracking-wide font-medium w-full sm:w-auto">
+                        Send Message
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <div class="section-divider max-w-4xl mx-auto"></div>
+
+        <!-- Footer -->
+        <footer class="py-12 sm:py-16 px-4 sm:px-6">
+            <div class="max-w-4xl mx-auto text-center">
+                <img src="gsylabs.webp" alt="GSY Labs" class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 rounded-full opacity-80">
+                <p class="text-white/50 mb-6 sm:mb-8 max-w-md mx-auto text-sm sm:text-base">
+                    Building modern infrastructure tools for Guernsey. Have a question or suggestion?
+                </p>
+                <div class="flex flex-col sm:flex-row flex-wrap justify-center gap-4 sm:gap-6 mb-8 sm:mb-12">
+                    <a href="mailto:contact@gsylabs.gg" class="flex items-center justify-center gap-2 text-white/60 hover:text-white transition-colors text-sm sm:text-base" aria-label="Send email to contact@gsylabs.gg">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
+                        </svg>
+                        <span class="hidden sm:inline">contact@gsylabs.gg</span>
+                        <span class="sm:hidden">Email</span>
+                    </a>
+                    <a href="https://www.linkedin.com/company/gyslabs" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 text-white/60 hover:text-white transition-colors text-sm sm:text-base" aria-label="Visit GSY Labs LinkedIn profile (opens in new window)">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        <span class="hidden sm:inline">LinkedIn</span>
+                        <span class="sm:hidden">LinkedIn</span>
+                    </a>
+                </div>
+                <div class="text-white/25 text-xs sm:text-sm">© 2026 GSY Labs. All rights reserved.</div>
+            </div>
+        </footer>
+
+    </main>
 
     <script>
     (() => {
-        const canvas = document.getElementById('c');
-        const ctx    = canvas.getContext('2d');
-
-        let W = canvas.width  = window.innerWidth;
+        const canvas = document.getElementById('gol-canvas');
+        const ctx = canvas.getContext('2d');
+        const hero = document.getElementById('hero');
+        let W = canvas.width = window.innerWidth;
         let H = canvas.height = window.innerHeight;
+        let isPaused = false;
+        let mouseX = W / 2, mouseY = H / 2, mouseActive = false, mouseTimeout;
 
-        /* ── Card grid ───────────────────────────────────────── */
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+            mouseActive = true;
+            clearTimeout(mouseTimeout);
+            mouseTimeout = setTimeout(() => { mouseActive = false; }, 100);
+        });
+
         const CW = 22, CH = 22, GAP = 5;
-        const SX = CW + GAP,    SY  = CH + GAP;
-
-        /* ── Game of Life ────────────────────────────────────── */
+        const SX = CW + GAP, SY = CH + GAP;
         let cols, rows, state, next, bgCanvas;
+
+        const SEEDS = [
+            [[0,1],[0,2],[1,0],[1,1],[2,1]],                               // R-pentomino
+            [[0,0],[0,1],[1,1],[1,2],[2,0]],                               // S-tetromino
+            [[0,2],[1,0],[1,2],[2,1],[2,2],[3,1]],                         // Acorn
+            [[0,0],[0,2],[1,0],[2,0],[2,3],[3,1],[3,2],[3,3],[4,0],[4,2]], // Glider gun seed
+        ];
 
         function buildScene() {
             cols = Math.ceil(W / SX) + 2;
             rows = Math.ceil(H / SY) + 2;
             state = new Uint8Array(cols * rows);
             next  = new Uint8Array(cols * rows);
-
-            /* Seed with two R-pentominoes at random positions */
-            state.fill(0);
-            for (let i = 0; i < 2; i++) {
-                const cr = 2 + ((Math.random() * (rows - 4)) | 0);
-                const cc = 2 + ((Math.random() * (cols - 4)) | 0);
-                [[0,1],[0,2],[1,0],[1,1],[2,1]].forEach(([dr,dc]) =>
-                    { state[(cr+dr)*cols+(cc+dc)] = 1; });
+            const count = 6 + ((Math.random() * 4) | 0);
+            for (let i = 0; i < count; i++) {
+                const pattern = SEEDS[(Math.random() * SEEDS.length) | 0];
+                const cr = 4 + ((Math.random() * (rows - 8)) | 0);
+                const cc = 4 + ((Math.random() * (cols - 8)) | 0);
+                pattern.forEach(([dr, dc]) => {
+                    const idx = (cr + dr) * cols + (cc + dc);
+                    if (idx >= 0 && idx < state.length) state[idx] = 1;
+                });
             }
-
-            /* Offscreen canvas — all cells dark, blit each frame as base */
             bgCanvas = document.createElement('canvas');
             bgCanvas.width = W; bgCanvas.height = H;
             const bg = bgCanvas.getContext('2d');
-            bg.fillStyle = 'rgb(20,20,20)';
+            bg.fillStyle = 'rgb(18,18,22)';
             for (let r = 0; r < rows; r++)
                 for (let c = 0; c < cols; c++)
                     bg.fillRect(c * SX + GAP / 2, r * SY + GAP / 2, CW, CH);
         }
+
         buildScene();
+
+        let stableCount = 0;
+        let lastAlive = -1;
 
         function stepGoL() {
             let alive = 0;
@@ -222,56 +516,70 @@
                 for (let c = 0; c < cols; c++) {
                     const n =
                         state[((r-1+rows)%rows)*cols + (c-1+cols)%cols] +
-                        state[((r-1+rows)%rows)*cols +  c             ] +
-                        state[((r-1+rows)%rows)*cols + (c+1  )%cols   ] +
-                        state[  r              *cols + (c-1+cols)%cols] +
-                        state[  r              *cols + (c+1  )%cols   ] +
-                        state[((r+1)%rows)*cols      + (c-1+cols)%cols] +
-                        state[((r+1)%rows)*cols      +  c             ] +
-                        state[((r+1)%rows)*cols      + (c+1  )%cols   ];
-                    const cur  = state[r * cols + c];
-                    const live = (cur && (n === 2 || n === 3)) || (!cur && n === 3) ? 1 : 0;
-                    next[r * cols + c] = live;
-                    alive += live;
+                        state[((r-1+rows)%rows)*cols + c] +
+                        state[((r-1+rows)%rows)*cols + (c+1)%cols] +
+                        state[r*cols + (c-1+cols)%cols] +
+                        state[r*cols + (c+1)%cols] +
+                        state[((r+1)%rows)*cols + (c-1+cols)%cols] +
+                        state[((r+1)%rows)*cols + c] +
+                        state[((r+1)%rows)*cols + (c+1)%cols];
+                    const cur = state[r * cols + c];
+                    next[r * cols + c] = (cur && (n === 2 || n === 3)) || (!cur && n === 3) ? 1 : 0;
+                    alive += next[r * cols + c];
                 }
             }
             const tmp = state; state = next; next = tmp;
-            /* Restart from centre if population collapses */
-            if (alive < 5) buildScene();
+            if (alive === lastAlive) { stableCount++; } else { stableCount = 0; }
+            lastAlive = alive;
+            if (alive < 10 || stableCount > 30) { stableCount = 0; buildScene(); }
         }
 
-        /* ── Frame loop ──────────────────────────────────────── */
-        let tick = 0;
-
-        function frame() {
+        let lastTime = 0;
+        function frame(currentTime) {
             requestAnimationFrame(frame);
-
-            /* One GoL generation every 5 frames (~12 gen/sec) */
-            if (++tick % 5 === 0) stepGoL();
-
-            /* Dark base, then light up alive cells on top */
+            if (isPaused) return;
+            if (currentTime - lastTime < 83) return;
+            lastTime = currentTime;
+            stepGoL();
             ctx.drawImage(bgCanvas, 0, 0);
-            ctx.fillStyle = 'rgb(52,54,62)';
+            const HALO = 200;
             for (let i = 0; i < state.length; i++) {
-                if (!state[i]) continue;
                 const c = i % cols, r = (i / cols) | 0;
-                ctx.fillRect(c * SX + GAP / 2, r * SY + GAP / 2, CW, CH);
+                const x = c * SX + GAP / 2, y = r * SY + GAP / 2;
+                const dist = Math.sqrt((x + CW/2 - mouseX) ** 2 + (y + CH/2 - mouseY) ** 2);
+                if (state[i]) {
+                    let b = 70;
+                    if (mouseActive && dist < HALO) b = 70 + 25 * (1 - dist / HALO);
+                    ctx.fillStyle = `rgb(${b},${b+2},${b+5})`;
+                    ctx.fillRect(x, y, CW, CH);
+                } else if (mouseActive && dist < HALO) {
+                    ctx.fillStyle = `rgba(55,57,65,${0.12 * (1 - dist / HALO)})`;
+                    ctx.fillRect(x, y, CW, CH);
+                }
             }
         }
 
         requestAnimationFrame(frame);
 
-        /* ── Resize ──────────────────────────────────────────── */
+        window.addEventListener('scroll', () => {
+            const visible = hero.getBoundingClientRect().bottom > 0;
+            if (!visible && !isPaused) { isPaused = true; canvas.classList.add('hidden-canvas'); }
+            else if (visible && isPaused) { isPaused = false; canvas.classList.remove('hidden-canvas'); }
+        }, { passive: true });
+
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                const t = document.querySelector(this.getAttribute('href'));
+                if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
         window.addEventListener('resize', () => {
-            W = canvas.width  = window.innerWidth;
+            W = canvas.width = window.innerWidth;
             H = canvas.height = window.innerHeight;
             buildScene();
         });
-
-        /* ── Animated dots ───────────────────────────────────── */
-        const dotsEl = document.querySelector('.dots');
-        let dc = 0;
-        setInterval(() => { dc = (dc + 1) % 4; dotsEl.textContent = '.'.repeat(dc || 1); }, 500);
     })();
     </script>
 </body>
