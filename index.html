@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GYS Labs - Coming Soon</title>
+    <link rel="icon" type="image/png" href="GYSLabs.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #000;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+
+        .logo {
+            position: fixed;
+            top: 30px; right: 30px;
+            width: 110px; height: 110px;
+            z-index: 1000;
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(255,255,255,0.08);
+        }
+
+        .card-container {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .card {
+            background: rgba(12, 12, 12, 0.88);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 60px 80px;
+            text-align: center;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 8px 48px rgba(0,0,0,0.6);
+        }
+
+        .card h1 {
+            color: #fff;
+            font-size: 48px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .card p {
+            color: rgba(255,255,255,0.5);
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: rgba(255,255,255,0.08);
+            margin: 36px 0 28px;
+        }
+
+        .contact {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            pointer-events: all;
+        }
+
+        .contact a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.4);
+            text-decoration: none;
+            font-size: 13px;
+            letter-spacing: 1px;
+            transition: color 0.2s;
+        }
+
+        .contact a:hover { color: rgba(255,255,255,0.9); }
+
+        .contact a svg {
+            width: 16px; height: 16px;
+            fill: currentColor;
+            flex-shrink: 0;
+        }
+
+        .contact-sep {
+            width: 1px; height: 16px;
+            background: rgba(255,255,255,0.12);
+        }
+
+        .projects {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            pointer-events: all;
+        }
+
+        .projects a {
+            color: rgba(255,255,255,0.3);
+            text-decoration: none;
+            font-size: 12px;
+            letter-spacing: 1.5px;
+            text-transform: lowercase;
+            transition: color 0.2s;
+        }
+
+        .projects a:hover { color: rgba(255,255,255,0.8); }
+
+        @media (max-width: 768px) {
+            .logo { width: 75px; height: 75px; top: 16px; right: 16px; }
+            .card { padding: 36px 40px; margin: 0 16px; }
+            .card h1 { font-size: 28px; letter-spacing: 4px; }
+            .card p { font-size: 13px; }
+            .contact { gap: 16px; }
+            .contact a { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="c"></canvas>
+
+    <img src="GYSLabs.png" alt="GYS Labs" class="logo">
+
+    <div class="card-container">
+        <div class="card">
+            <h1>Coming Soon</h1>
+            <p>Building something special<span class="dots">...</span></p>
+
+            <div class="divider"></div>
+
+            <div class="contact">
+                <a href="mailto:contact@gsylabs.gg">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
+                    </svg>
+                    contact@gsylabs.gg
+                </a>
+                <div class="contact-sep"></div>
+                <a href="https://www.linkedin.com/company/gyslabs" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    </svg>
+                    LinkedIn
+                </a>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="projects">
+                <a href="https://roads.gg" target="_blank" rel="noopener">roads.gg</a>
+                <div class="contact-sep"></div>
+                <a href="https://airways.gg" target="_blank" rel="noopener">airways.gg</a>
+                <div class="contact-sep"></div>
+                <a href="https://seas.gg" target="_blank" rel="noopener">seas.gg</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (() => {
+        const canvas = document.getElementById('c');
+        const ctx    = canvas.getContext('2d');
+
+        let W = canvas.width  = window.innerWidth;
+        let H = canvas.height = window.innerHeight;
+
+        /* ── Card grid ───────────────────────────────────────── */
+        const CW = 22, CH = 22, GAP = 5;
+        const SX = CW + GAP,    SY  = CH + GAP;
+
+        /* ── Game of Life ────────────────────────────────────── */
+        let cols, rows, state, next, bgCanvas;
+
+        function buildScene() {
+            cols = Math.ceil(W / SX) + 2;
+            rows = Math.ceil(H / SY) + 2;
+            state = new Uint8Array(cols * rows);
+            next  = new Uint8Array(cols * rows);
+
+            /* Seed with R-pentomino at a random position */
+            state.fill(0);
+            const cr = 2 + ((Math.random() * (rows - 4)) | 0);
+            const cc = 2 + ((Math.random() * (cols - 4)) | 0);
+            [[0,1],[0,2],[1,0],[1,1],[2,1]].forEach(([dr,dc]) =>
+                { state[(cr+dr)*cols+(cc+dc)] = 1; });
+
+            /* Offscreen canvas — all cells dark, blit each frame as base */
+            bgCanvas = document.createElement('canvas');
+            bgCanvas.width = W; bgCanvas.height = H;
+            const bg = bgCanvas.getContext('2d');
+            bg.fillStyle = 'rgb(20,20,20)';
+            for (let r = 0; r < rows; r++)
+                for (let c = 0; c < cols; c++)
+                    bg.fillRect(c * SX + GAP / 2, r * SY + GAP / 2, CW, CH);
+        }
+        buildScene();
+
+        function stepGoL() {
+            let alive = 0;
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const n =
+                        state[((r-1+rows)%rows)*cols + (c-1+cols)%cols] +
+                        state[((r-1+rows)%rows)*cols +  c             ] +
+                        state[((r-1+rows)%rows)*cols + (c+1  )%cols   ] +
+                        state[  r              *cols + (c-1+cols)%cols] +
+                        state[  r              *cols + (c+1  )%cols   ] +
+                        state[((r+1)%rows)*cols      + (c-1+cols)%cols] +
+                        state[((r+1)%rows)*cols      +  c             ] +
+                        state[((r+1)%rows)*cols      + (c+1  )%cols   ];
+                    const cur  = state[r * cols + c];
+                    const live = (cur && (n === 2 || n === 3)) || (!cur && n === 3) ? 1 : 0;
+                    next[r * cols + c] = live;
+                    alive += live;
+                }
+            }
+            const tmp = state; state = next; next = tmp;
+            /* Restart from centre if population collapses */
+            if (alive < 5) buildScene();
+        }
+
+        /* ── Frame loop ──────────────────────────────────────── */
+        let tick = 0;
+
+        function frame() {
+            requestAnimationFrame(frame);
+
+            /* One GoL generation every 15 frames (~4 gen/sec) */
+            if (++tick % 15 === 0) stepGoL();
+
+            /* Dark base, then light up alive cells on top */
+            ctx.drawImage(bgCanvas, 0, 0);
+            ctx.fillStyle = 'rgb(52,54,62)';
+            for (let i = 0; i < state.length; i++) {
+                if (!state[i]) continue;
+                const c = i % cols, r = (i / cols) | 0;
+                ctx.fillRect(c * SX + GAP / 2, r * SY + GAP / 2, CW, CH);
+            }
+        }
+
+        requestAnimationFrame(frame);
+
+        /* ── Resize ──────────────────────────────────────────── */
+        window.addEventListener('resize', () => {
+            W = canvas.width  = window.innerWidth;
+            H = canvas.height = window.innerHeight;
+            buildScene();
+        });
+
+        /* ── Animated dots ───────────────────────────────────── */
+        const dotsEl = document.querySelector('.dots');
+        let dc = 0;
+        setInterval(() => { dc = (dc + 1) % 4; dotsEl.textContent = '.'.repeat(dc || 1); }, 500);
+    })();
+    </script>
+</body>
+</html>

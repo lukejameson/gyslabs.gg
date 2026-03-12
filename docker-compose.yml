@@ -1,0 +1,16 @@
+services:
+  gyslabs:
+    build: .
+    restart: unless-stopped
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gyslabs.rule=Host(`gyslabs.gg`)"
+      - "traefik.http.routers.gyslabs.entrypoints=websecure"
+      - "traefik.http.routers.gyslabs.tls.certresolver=letsencrypt"
+      - "traefik.http.services.gyslabs.loadbalancer.server.port=80"
+
+networks:
+  web:
+    external: true
