@@ -225,6 +225,7 @@ function generatePostHTML(post) {
                     <header class="mb-8 pb-8 border-b border-white/10">
                         ${post.featured_image ? `<img src="${post.featured_image}" alt="${post.title}" class="w-full h-48 sm:h-64 object-cover rounded-xl mb-6">` : ''}
                         <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 leading-tight">${post.title}</h1>
+                        ${post.excerpt ? `<p class="text-lg text-white/60 mb-4 leading-relaxed italic">${post.excerpt}</p>` : ''}
                         <div class="flex flex-wrap items-center gap-4 text-sm text-white/50 mb-4">
                             <span class="flex items-center gap-1">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -247,7 +248,7 @@ function generatePostHTML(post) {
                             <div>
                                 <p class="text-sm text-white/50 mb-3">Share this post</p>
                                 <div class="flex gap-2">
-                                    <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://gsylabs.gg/blog/posts/${post.slug}/" 
+                                    <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://gsylabs.gg/blog/posts/${post.slug}/&title=${encodeURIComponent(post.title)}&summary=${encodeURIComponent(post.excerpt)}" 
                                        target="_blank" rel="noopener" 
                                        class="share-btn share-linkedin"
                                        aria-label="Share on LinkedIn">
