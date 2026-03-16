@@ -502,30 +502,41 @@ ${latestPostsHtml}
   console.log('✓ Updated homepage with latest posts');
 }
 
+function generatePostsJSON(posts) {
+  const postsData = posts.map(post => ({
+    title: post.title,
+    date: post.date,
+    author: post.author,
+    excerpt: post.excerpt,
+    slug: post.slug,
+    featured_image: post.featured_image || null
+  }));
+  
+  fs.writeFileSync(
+    path.join(__dirname, 'posts.json'),
+    JSON.stringify(postsData, null, 2)
+  );
+  console.log('✓ Generated: /blog/posts.json');
+}
+
 function build() {
   console.log('Building blog...');
-  
   const posts = getAllPosts();
   console.log(`Found ${posts.length} post(s)`);
-  
   posts.forEach(post => {
     const postDir = path.join(POSTS_OUTPUT_DIR, post.slug);
     if (!fs.existsSync(postDir)) {
       fs.mkdirSync(postDir, { recursive: true });
     }
-    
     const html = generatePostHTML(post);
     fs.writeFileSync(path.join(postDir, 'index.html'), html);
     console.log(`✓ Generated: /blog/posts/${post.slug}/`);
   });
-  
   const blogIndexHtml = generateBlogIndexHTML(posts);
   fs.writeFileSync(BLOG_INDEX_PATH, blogIndexHtml);
   console.log('✓ Generated: /blog/index.html');
-  
-  updateHomepageLatestPosts(posts);
-  
+  // Homepage now loads posts dynamically via JavaScript
+  generatePostsJSON(posts);
   console.log('\nBuild complete!');
 }
-
 build();

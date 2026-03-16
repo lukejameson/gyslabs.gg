@@ -11,6 +11,7 @@ COPY --from=builder /app/index.html /tmp/index.html
 COPY --from=builder /app/blog/index.html /usr/share/nginx/html/blog/index.html
 COPY --from=builder /app/blog/posts /usr/share/nginx/html/blog/posts
 COPY --from=builder /app/blog/images /usr/share/nginx/html/blog/images
+COPY --from=builder /app/blog/posts.json /usr/share/nginx/html/blog/posts.json
 COPY images/ /usr/share/nginx/html/images/
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
