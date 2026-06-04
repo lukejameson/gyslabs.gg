@@ -1,60 +1,72 @@
 # todo.yaml — single source of truth for LLM
-# Updated: 2026-06-04T15:00:00+01:00
+# Updated: 2026-06-04T15:30:00+01:00
 
 goal: >
-  Fix local development setup so index.html loads correctly with Live Server
-  without breaking the production Docker build.
+  Implement SEO improvements across the GSY Labs site and blog.
 
 why_how: >
-  The site is a static HTML site with Tailwind CSS and Umami Analytics.
-  Two issues prevent it from running locally:
-  1. tailwind.css is only generated during Docker build, not locally
-  2. ${UMAMI_URL}/${UMAMI_TRACKING_ID} placeholders are substituted by
-     envsubst in Docker but left as-is locally, causing broken script loads
-  We'll add Tailwind as a dev dependency with a local build script, generate
-  the CSS, and make the Umami script gracefully skip when not in production.
+  The site has good foundations (OG tags, JSON-LD on posts, semantic HTML)
+  but lacks critical SEO infrastructure: no sitemap.xml, no robots.txt, no
+  canonical URLs, no breadcrumb structured data, and massive unoptimised
+  images. We'll add these by modifying the blog build script to generate
+  them, creating robots.txt, adding canonical links, and optimising images.
 
 expected: >
-  Running locally with Live Server produces no CSS or script loading errors.
-  The Docker build continues to work (tailwind.css in Dockerfile, envsubst
-  in entrypoint). Both environments are happy.
+  After implementation: sitemap.xml and robots.txt at root, canonical URLs on
+  all pages, breadcrumb JSON-LD on blog posts, Blog schema on blog index,
+  compressed hero image (965KB -> ~150KB). All changes auto-generate from
+  the build script so new posts get everything automatically.
 
 status: complete
 
 tasks:
   - phase: 1
-    name: Fix tailwind.css
+    name: Fix build script & sitemap
     status: done
     items:
       - done: true
-        action: Add tailwindcss as a devDependency
+        action: Add canonical link tags to generated blog post HTML
       - done: true
-        action: Add "build:css" script to package.json
+        action: Add breadcrumb JSON-LD to generated blog post HTML
       - done: true
-        action: Generate tailwind.css locally
+        action: Add Blog schema JSON-LD to generated blog index HTML
+      - done: true
+        action: Add canonical link tag to generated blog index HTML
+      - done: true
+        action: Add sitemap.xml generation to build script
 
   - phase: 2
-    name: Fix Umami Script Placeholder
+    name: Create root-level files
     status: done
     items:
       - done: true
-        action: Replace inline script tag with JS-based conditional loading
+        action: Create robots.txt with sitemap reference
       - done: true
-        action: Verify the fix works locally (envsubst skips, prod loads)
+        action: Add canonical URL to index.html
+      - done: true
+        action: Fix inconsistent meta descriptions on homepage
 
   - phase: 3
-    name: Verify
+    name: Optimise blog images
     status: done
     items:
       - done: true
-        action: Confirm no broken resource loads in browser
+        action: Compress welcome-to-the-gsy-labs-blog-image.webp (965KB -> ~150KB)
+
+  - phase: 4
+    name: Rebuild & verify
+    status: done
+    items:
       - done: true
-        action: Confirm Docker build still works
+        action: Run npm run build
+      - done: true
+        action: Verify sitemap.xml, robots.txt, canonical tags are correct
 
 notes:
-  - tailwind.css is gitignored? No — it's not in .gitignore but doesn't exist
-  - Dockerfile builds tailwind.css via npx tailwindcss@3 in a separate stage
-  - docker-entrypoint.sh uses envsubst to replace ${VARS} at runtime
-  - The blog HTML files also reference /tailwind.css — same fix covers them
+  - apps (roads.gg, airways.gg, etc.) are separate domains — not included in sitemap
+  - sitemap priority: homepage=1.0, blog index=0.8, posts=0.6
+  - brew install webp or use cwebp/npx for image compression
+  - Blog build script is at blog/build-blog.js
+  - All generated blog HTML is in .gitignore
 
 discovered: []

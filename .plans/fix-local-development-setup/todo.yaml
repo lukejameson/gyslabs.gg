@@ -1,0 +1,60 @@
+# todo.yaml — single source of truth for LLM
+# Updated: 2026-06-04T15:00:00+01:00
+
+goal: >
+  Fix local development setup so index.html loads correctly with Live Server
+  without breaking the production Docker build.
+
+why_how: >
+  The site is a static HTML site with Tailwind CSS and Umami Analytics.
+  Two issues prevent it from running locally:
+  1. tailwind.css is only generated during Docker build, not locally
+  2. ${UMAMI_URL}/${UMAMI_TRACKING_ID} placeholders are substituted by
+     envsubst in Docker but left as-is locally, causing broken script loads
+  We'll add Tailwind as a dev dependency with a local build script, generate
+  the CSS, and make the Umami script gracefully skip when not in production.
+
+expected: >
+  Running locally with Live Server produces no CSS or script loading errors.
+  The Docker build continues to work (tailwind.css in Dockerfile, envsubst
+  in entrypoint). Both environments are happy.
+
+status: complete
+
+tasks:
+  - phase: 1
+    name: Fix tailwind.css
+    status: done
+    items:
+      - done: true
+        action: Add tailwindcss as a devDependency
+      - done: true
+        action: Add "build:css" script to package.json
+      - done: true
+        action: Generate tailwind.css locally
+
+  - phase: 2
+    name: Fix Umami Script Placeholder
+    status: done
+    items:
+      - done: true
+        action: Replace inline script tag with JS-based conditional loading
+      - done: true
+        action: Verify the fix works locally (envsubst skips, prod loads)
+
+  - phase: 3
+    name: Verify
+    status: done
+    items:
+      - done: true
+        action: Confirm no broken resource loads in browser
+      - done: true
+        action: Confirm Docker build still works
+
+notes:
+  - tailwind.css is gitignored? No — it's not in .gitignore but doesn't exist
+  - Dockerfile builds tailwind.css via npx tailwindcss@3 in a separate stage
+  - docker-entrypoint.sh uses envsubst to replace ${VARS} at runtime
+  - The blog HTML files also reference /tailwind.css — same fix covers them
+
+discovered: []

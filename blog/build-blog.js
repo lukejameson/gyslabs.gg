@@ -76,6 +76,32 @@ function generatePostHTML(post) {
     <meta name="twitter:title" content="${post.title}">
     <meta name="twitter:description" content="${post.excerpt}">
     <meta name="twitter:image" content="https://gsylabs.gg${ogImage}">
+    <link rel="canonical" href="https://gsylabs.gg/blog/posts/${post.slug}/">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://gsylabs.gg/"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Blog",
+                "item": "https://gsylabs.gg/blog/"
+            },
+            {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "${post.title}"
+            }
+        ]
+    }
+    </script>
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -330,6 +356,24 @@ function generateBlogIndexHTML(posts) {
     <meta name="twitter:title" content="GSY Labs Blog">
     <meta name="twitter:description" content="Insights about building modern infrastructure tools for Guernsey.">
     <meta name="twitter:image" content="https://gsylabs.gg/images/gsylabs.webp">
+    <link rel="canonical" href="https://gsylabs.gg/blog/">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        "name": "GSY Labs Blog",
+        "description": "Insights about building modern infrastructure tools for Guernsey.",
+        "url": "https://gsylabs.gg/blog/",
+        "publisher": {
+            "@type": "Organization",
+            "name": "GSY Labs",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://gsylabs.gg/images/gsylabs.webp"
+            }
+        }
+    }
+    </script>
     <title>Blog | GSY Labs</title>
     <link rel="icon" type="image/png" href="/images/gsylabs.webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -481,6 +525,40 @@ ${latestPostsHtml}
   console.log('✓ Updated homepage with latest posts');
 }
 
+function generateSitemap(posts) {
+  const SITEMAP_PATH = path.join(__dirname, '..', 'sitemap.xml');
+  const now = new Date().toISOString().split('T')[0];
+
+  let urls = `  <url>
+    <loc>https://gsylabs.gg/</loc>
+    <priority>1.0</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://gsylabs.gg/blog/</loc>
+    <priority>0.8</priority>
+    <changefreq>weekly</changefreq>
+  </url>`;
+
+  posts.forEach(post => {
+    urls += `
+  <url>
+    <loc>https://gsylabs.gg/blog/posts/${post.slug}/</loc>
+    <lastmod>${post.date || now}</lastmod>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>`;
+  });
+
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`;
+
+  fs.writeFileSync(SITEMAP_PATH, sitemap);
+  console.log('✓ Generated: /sitemap.xml');
+}
+
 function generatePostsJSON(posts) {
   const postsData = posts.map(post => ({
     title: post.title,
@@ -514,8 +592,8 @@ function build() {
   const blogIndexHtml = generateBlogIndexHTML(posts);
   fs.writeFileSync(BLOG_INDEX_PATH, blogIndexHtml);
   console.log('✓ Generated: /blog/index.html');
-  // Homepage now loads posts dynamically via JavaScript
   generatePostsJSON(posts);
+  generateSitemap(posts);
   console.log('\nBuild complete!');
 }
 build();
