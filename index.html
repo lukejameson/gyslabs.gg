@@ -20,7 +20,19 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/tailwind.css">
-    <script async src="${UMAMI_URL}/script.js" data-website-id="${UMAMI_TRACKING_ID}"></script>
+    <script>
+      (function() {
+        var u = '${UMAMI_URL}';
+        var i = '${UMAMI_TRACKING_ID}';
+        if (u.indexOf('$') === -1 && i.indexOf('$') === -1 && u && i) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = u + '/script.js';
+          s.setAttribute('data-website-id', i);
+          document.head.appendChild(s);
+        }
+      })();
+    </script>
     <style>
         * {
             margin: 0;

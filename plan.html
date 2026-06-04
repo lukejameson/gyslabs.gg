@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan — GSY Labs Local Dev Fix</title>
+<style>
+  :root { --bg: #f8f9fa; --card: #fff; --text: #1a1a2e; --muted: #6b7280;
+          --border: #e5e7eb; --cyan: #0891b2; --green: #16a34a; --blue: #2563eb;
+          --purple: #7c3aed; --amber: #d97706; --red: #dc2626; --radius: 10px; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg);
+         color: var(--text); max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
+  header { margin-bottom: 2rem; }
+  h1 { font-size: 1.8rem; display: flex; align-items: center; gap: 0.5rem; }
+  .meta { color: var(--muted); font-size: 0.85rem; margin-top: 0.25rem; }
+  .badge { display: inline-block; font-size: 0.7rem; font-weight: 600; padding: 2px 10px;
+           border-radius: 99px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge-pending { background: #f1f5f9; color: #64748b; }
+  .badge-done    { background: #dcfce7; color: #16a34a; }
+  .goal { background: #ecfeff; border-left: 4px solid var(--cyan); padding: 1rem 1.25rem;
+          border-radius: 0 var(--radius) var(--radius) 0; margin-bottom: 1.25rem;
+          font-size: 1.05rem; line-height: 1.55; }
+  .goal::before { content: "🎯 "; font-size: 1.15rem; }
+  .progress-wrap { margin-bottom: 1.5rem; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 0.8rem;
+                    color: var(--muted); margin-bottom: 0.35rem; }
+  .progress-bar { height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--cyan), var(--blue));
+                   border-radius: 99px; transition: width 0.4s ease; }
+  .info-box { border-radius: 0 var(--radius) var(--radius) 0; padding: 1rem 1.25rem;
+              margin-bottom: 1.25rem; font-size: 0.97rem; line-height: 1.55; }
+  .info-box h3 { font-size: 0.95rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem; }
+  .whyhow-box { background: #eff6ff; border-left: 4px solid var(--blue); }
+  .whyhow-box h3 { color: var(--blue); }
+  .expected-box { background: #f0fdf4; border-left: 4px solid var(--green); }
+  .expected-box h3 { color: var(--green); }
+  .phase { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+           padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+  .phase h2 { font-size: 1.05rem; display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
+  .phase-icon { font-size: 1.1rem; line-height: 1; }
+  .task-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.3rem 0; font-size: 0.95rem; }
+  .task-row input[type="checkbox"] { accent-color: var(--cyan); width: 1rem; height: 1rem; flex-shrink: 0; }
+  .task-row.done label { text-decoration: line-through; color: var(--muted); }
+  .notes-box { background: #fffbeb; border: 1px solid #fcd34d; border-radius: var(--radius);
+               padding: 1rem 1.25rem; margin-top: 1.5rem; }
+  .notes-box h3 { font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--amber); }
+  .notes-box ul { list-style: disc; margin-left: 1.25rem; font-size: 0.9rem; color: #78350f; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📋 Plan — GSY Labs Local Dev Fix</h1>
+  <!-- STATUS: complete -->
+  <p class="meta">Generated: 2026-06-04 &middot; Status: <span class="badge badge-done">complete</span></p>
+</header>
+
+<div class="goal">Fix local development setup so index.html loads correctly with Live Server without breaking the production Docker build.</div>
+
+<div class="progress-wrap">
+  <div class="progress-label"><span>Progress</span><span>6 / 6</span></div>
+  <div class="progress-bar"><div class="progress-fill" style="width: 100%;"></div></div>
+</div>
+
+<div class="info-box whyhow-box">
+  <h3><span class="section-icon">💡</span> Why &amp; How</h3>
+  <p>The site is a static HTML site. Two issues prevent local dev:<br>
+  <strong>1.</strong> tailwind.css is only generated during Docker build, not locally<br>
+  <strong>2.</strong> ${UMAMI_URL}/${UMAMI_TRACKING_ID} placeholders are substituted by envsubst only in Docker. Locally, the browser tries to fetch these as literal URLs, causing NS_ERROR_CORRUPTED_CONTENT + MIME type mismatch errors that block all styles from loading.<br><br>
+  Fix: install Tailwind CSS + generate the CSS file locally; replace the Umami script tag with JS that gracefully skips when placeholders aren't substituted.</p>
+</div>
+
+<div class="info-box expected-box">
+  <h3><span class="section-icon">🎁</span> Expected Outcome</h3>
+  <p>Run <code>npm run build:css && npm run build</code> then open with Live Server — no CSS or script loading errors. Docker build continues to work unchanged.</p>
+</div>
+
+<!-- PHASE: 1 (status: done) -->
+<div class="phase">
+  <h2><span class="phase-icon">✅</span> Phase 1: Fix tailwind.css <span class="badge badge-done">done</span></h2>
+  <div class="task-row done"><input type="checkbox" checked disabled><label>Add tailwindcss as a devDependency</label></div>
+  <div class="task-row done"><input type="checkbox" checked disabled><label>Add "build:css" script to package.json</label></div>
+  <div class="task-row done"><input type="checkbox" checked disabled><label>Generate tailwind.css locally</label></div>
+</div>
+
+<!-- PHASE: 2 (status: done) -->
+<div class="phase">
+  <h2><span class="phase-icon">✅</span> Phase 2: Fix Umami Script <span class="badge badge-done">done</span></h2>
+  <div class="task-row done"><input type="checkbox" checked disabled><label>Replace inline script tag with JS-based conditional loading</label></div>
+  <div class="task-row done"><input type="checkbox" checked disabled><label>Verify the fix works locally and in prod</label></div>
+</div>
+
+<!-- PHASE: 3 (status: done) -->
+<div class="phase">
+  <h2><span class="phase-icon">✅</span> Phase 3: Verify <span class="badge badge-done">done</span></h2>
+  <div class="task-row done"><input type="checkbox" checked disabled><label>Confirm no broken resource loads in browser</label></div>
+  <div class="task-row done"><input type="checkbox" checked disabled><label>Confirm Docker build still works</label></div>
+</div>
+
+<div class="notes-box">
+  <h3><span class="section-icon">📝</span> Notes</h3>
+  <ul>
+    <li>Dockerfile builds tailwind.css via npx tailwindcss@3, which stays unchanged</li>
+    <li>docker-entrypoint.sh uses envsubst on index.html — that stays unchanged</li>
+    <li>Blog HTML files also reference /tailwind.css — generated CSS covers them too</li>
+    <li>The Umami JS fix detects whether envsubst has run: if ${UMAMI_URL} is still a template literal, skip loading</li>
+  </ul>
+</div>
+
+</body>
+</html>

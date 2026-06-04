@@ -1,10 +1,18 @@
 [
   {
-    "title": "Welcome to the GSY Labs Blog",
+    "title": "Introducing tabl.gg",
+    "date": "2026-06-04",
+    "author": "Luke",
+    "excerpt": "Say goodbye to calling around restaurants one by one. tabl.gg makes booking a table in Guernsey as easy as ordering takeaway — just type what you want and book in two clicks.",
+    "slug": "introducing-tablgg",
+    "featured_image": "/images/tablgg-banner.webp"
+  },
+  {
+    "title": "Welcome to the GSY Labs",
     "date": "2026-03-16",
     "author": "GSY Labs Team",
     "excerpt": "Guernsey has great public data but lacked modern interfaces. So I built some.",
-    "slug": "welcome-to-the-gsy-labs-blog",
+    "slug": "welcome-to-the-gsy-labs",
     "featured_image": "/blog/images/welcome-to-the-gsy-labs-blog-image.webp"
   }
 ]
